@@ -25,10 +25,7 @@ async function init() {
 
         try {
             const answers = await getOneEmployee();
-
 ///////////////////////////////
-            
-
             switch (answers.role) {
                 case "Manager":
                     const officePhone = await getOneAnswer("What is this employee's Office Phone #?");
@@ -50,11 +47,6 @@ async function init() {
             }
 /////////////////////////////////
             const answer3 = await promptToContinue("Would you like to enter another employee?");
-
-        //     console.log(`name was: ${answers.name}`);
-        //    // console.log(`alien was: ${answer2.answer}`);
-        //     console.log(`another was: ${answer3.answer}`);
-
             another_employee = answer3.answer;
 
         } catch (err) {
@@ -62,7 +54,7 @@ async function init() {
         }
     }
 }
-//const getInputsAsync = util.promisify(init);
+
 
 async function writeTeamFile() {
 
@@ -70,8 +62,8 @@ async function writeTeamFile() {
         const nothing = await init();
         console.log("Successfully wrote to index.html");
         console.log(`second name is ${employees[1].getName()}`);
-    } catch (error) {
-
+    } catch (err) {
+        console.log(err);
     }
 }
 
