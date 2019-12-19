@@ -3,9 +3,10 @@ const manager_class = require("./lib/manager.js");
 const engineer_class = require("./lib/engineer.js");
 const intern_class = require("./lib/intern.js");
 const inquirer = require("inquirer");
+const fs=require("fs");
 
 const util = require("util");
-
+var cards_html="";
 
 
 var this_manager = new manager_class(); //placeholders for later
@@ -60,8 +61,80 @@ async function writeTeamFile() {
 
     try {
         const nothing = await init();
-        console.log("Successfully wrote to index.html");
-        console.log(`second name is ${employees[1].getName()}`);
+
+        //populate the html
+        var first="";
+        var middle="";
+        var last="";
+
+        try {
+            fs.unlinkSync("./output/index.html")
+            //file removed
+          } catch(err) {
+            //console.error(err)   
+            //fail quietly here since there might legitimately not be a file yet.
+          }
+
+
+        fs.readFile("./templates/main_begin.html", "utf8", function(error, data) {
+            if (error) {
+              return console.log(error);
+            }
+            first=data;
+
+            fs.appendFile ("./output/index.html", first , function (err) {
+                if (err) {
+                  return console.log (err);
+                }
+              ////////////
+              //cycle through the employee array, building up the cards
+              /////////////
+              cards_html="";
+              for (let i=0;i<employees.length;i++){
+                  console.log(employees[i].getRole());
+                switch (employees[i].getRole()) {
+                    case "Manager":
+                        cards_html+=html_manager(employees[i]);   
+                        break;
+                    case "Engineer":
+                        cards_html+=html_engineer(employees[i]);   
+                        break;
+                    case "Intern":
+                        cards_html+=html_intern(employees[i]);   
+                    break;
+                    default:
+                        break;
+                }
+
+               // console.log(cards_html);
+              }
+                fs.appendFile ("./output/index.html", cards_html , function (err) {
+                    if (err) {
+                      return console.log (err);
+                    }
+                  
+                    fs.readFile("./templates/main_end.html", "utf8", function(error, data) {
+                        if (error) {
+                          return console.log(error);
+                        }
+                        last=data;
+
+                        fs.appendFile ("./output/index.html", last , function (err) {
+                            if (err) {
+                              return console.log (err);
+                            }
+                          
+                            console.log ('Success!');
+                          });
+                    });
+                  });
+              });
+
+
+        });
+
+    
+       
     } catch (err) {
         console.log(err);
     }
@@ -186,3 +259,76 @@ function getOneEmployee_old() {
             }
         });
 }
+
+function html_manager(manager){
+var thing = 
+`<div  class="col-sm-4">
+<div class="card">
+  <div class="card-body">
+    <div class="card-top">
+      <h5 class="card-title">${manager.name}</h5>
+      <h5 class="card-title">
+        <i class="fas fa-mug-hot"></i> Manager
+      </h5>
+    </div>
+
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item">ID: ${manager.id}</li>
+      <li class="list-group-item">Email: ${manager.email}</li>
+      <li class="list-group-item">Office Number: ${manager.officeNumber}</li>
+    </ul>
+  </div>
+  </div>
+</div>`
+return thing;
+
+}
+
+
+function html_engineer(engineer){
+    var thing = 
+    `<div  class="col-sm-4">
+    <div class="card">
+      <div class="card-body">
+        <div class="card-top">
+          <h5 class="card-title">${engineer.name}</h5>
+          <h5 class="card-title">
+          <i class="fas fa-glasses"></i> Engineer
+          </h5>
+        </div>
+        
+        <ul class="list-group list-group-flush">
+          <li class="list-group-item">ID: ${engineer.id}</li>
+          <li class="list-group-item">Email: ${engineer.email}</li>
+          <li class="list-group-item">GitHub: ${engineer.github}</li>
+        </ul>
+      </div>
+      </div>
+    </div>`
+    return thing;
+    
+    }
+
+    function html_intern(intern){
+        var thing = 
+        `<div  class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <div class="card-top">
+              <h5 class="card-title">${intern.name}</h5>
+              <h5 class="card-title">
+              <i class="fas fa-user-graduate"></i> intern
+              </h5>
+            </div>
+            
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item">ID: ${intern.id}</li>
+              <li class="list-group-item">Email: ${intern.email}</li>
+              <li class="list-group-item">School: ${intern.school}</li>
+            </ul>
+          </div>
+          </div>
+        </div>`
+        return thing;
+        
+        }
